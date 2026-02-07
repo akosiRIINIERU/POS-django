@@ -1,15 +1,40 @@
 {% extends 'store/base.html' %}
 {% block content %}
-<h2>Our Store Branches</h2>
-<div class="row">
-    {% for store in stores %}
-    <div class="col-md-4 mb-3 animate__animated animate__slideInUp">
-        <div class="card border-primary p-3 h-100">
-            <h5 class="text-primary">{{ store.store_name }}</h5>
-            <p class="mb-0"><strong>Address:</strong></p>
-            <p>{{ store.store_address }}</p>
+<div class="row animate__animated animate__fadeIn">
+    <div class="col-md-4">
+        <div class="card shadow-sm p-4 border-primary sticky-top" style="top: 20px;">
+            <h4 class="text-primary">Add New Branch</h4>
+            <hr>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="small fw-bold">Store Branch Name</label>
+                    <input type="text" name="store_name" class="form-control" placeholder="e.g. Shopee Mall CDO" required>
+                </div>
+                <div class="mb-3">
+                    <label class="small fw-bold">Physical Address</label>
+                    <textarea name="store_address" class="form-control" rows="3" placeholder="Street, City, Province" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 shadow-sm">Register Branch</button>
+            </form>
         </div>
     </div>
-    {% endfor %}
+
+    <div class="col-md-8">
+        <h2 class="mb-4">Our Store Branches</h2>
+        <div class="row">
+            {% for store in stores %}
+            <div class="col-md-6 mb-3">
+                <div class="card border-0 shadow-sm h-100 p-3 animate__animated animate__slideInUp">
+                    <h5 class="text-primary fw-bold">{{ store.store_name }}</h5>
+                    <p class="mb-0 small text-muted"><strong>Address:</strong></p>
+                    <p class="small">{{ store.store_address }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center text-muted">No branches registered.</div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
 {% endblock %}
