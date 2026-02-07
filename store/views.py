@@ -2,13 +2,19 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
 
 # 1. BROWSE: The home page (This was likely missing or misspelled)
-def browse(request):
+ddef browse(request):
     products = Product.objects.all()
-    customers = Customer.objects.all() # Get all customers for the POS dropdown
+    customers = Customer.objects.all()
     return render(request, 'store/browse/list.html', {
         'products': products, 
         'customers': customers
     })
+
+def delete_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    product.delete()
+    return redirect('browse')
+
 # 2. CUSTOMERS: View and Register Customers in-app
 def customer_list(request):
     if request.method == "POST":
@@ -77,35 +83,24 @@ def inventory_manage(request):
 
 # 5. CHECKOUT & POS LOGIC
 def add_to_checkout(request, product_id):
-    # Get the customer ID from the URL or a form
     customer_id = request.GET.get('customer_id')
+    # If no ID is passed, it falls back to first customer to prevent IntegrityError
+    customer = get_object_or_404(Customer, id=customer_id) if customer_id else Customer.objects.first()
     
-    if not customer_id:
-        # Fallback to the first customer if none selected, 
-        # but redirect to register if none exist in DB
-        customer = Customer.objects.first()
-        if not customer:
-            return redirect('customer_list')
-    else:
-        customer = get_object_or_404(Customer, id=customer_id)
-
     product = get_object_or_404(Product, id=product_id)
-    
-    # This prevents the NOT NULL error by ensuring a valid customer object
-    order, _ = Order.objects.get_or_create(
-        customer=customer, 
-        store=product.store, 
-        complete=False
-    )
-    
+    order, _ = Order.objects.get_or_create(customer=customer, store=product.store, complete=False)
     OrderItem.objects.create(order=order, product=product, quantity=1)
-    return redirect('browse')
-
+    
+    # Redirect back to browse but keep the customer selected
+    return redirect(f'/?customer_id={customer.id}')
 def checkout_summary(request):
-    customer = Customer.objects.first()
+    customer_id = request.GET.get('customer_id')
+    customer = get_object_or_404(Customer, id=customer_id) if customer_id else Customer.objects.first()
+    
     order = Order.objects.filter(customer=customer, complete=False).first()
     items = order.orderitem_set.all() if order else []
-    return render(request, 'store/checkout/summary.html', {'items': items, 'order': order})
+    
+    return render(request, 'store/checkout/summary.html', {'items': items, 'order': order, 'customer': customer})
 
 def process_payment(request):
     customer = Customer.objects.first()

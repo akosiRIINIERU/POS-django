@@ -1,46 +1,24 @@
-{% extends 'store/base.html' %}
-{% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4 animate__animated animate__fadeIn">
-    <h2>MGA BALIGYA NAKO</h2>
-    
-    <div class="col-md-4">
-        <label class="small fw-bold">Active Customer:</label>
-        <select id="pos-customer" class="form-select shadow-sm">
-            {% for c in customers %}
-                <option value="{{ c.id }}">{{ c.first_name }} {{ c.last_name }}</option>
-            {% empty %}
-                <option disabled>Register a customer first!</option>
-            {% endfor %}
-        </select>
-    </div>
-</div>
-
-<div class="row">
-    {% for p in products %}
-    <div class="col-md-3 mb-4">
-        <div class="card shadow-sm border-0 animate__animated animate__zoomIn">
-            <div class="card-body">
-                <p class="badge bg-warning text-dark">{{ p.store.store_name }}</p>
-                <h5>{{ p.product_name }}</h5>
-                <p class="text-danger fw-bold">₱{{ p.price }}</p>
-                <p class="text-muted small">{{ p.store.store_address }}</p>
-                
-                <button onclick="addToCart({{ p.id }})" class="btn btn-outline-danger w-100">Buy Now</button>
-            </div>
+{% for p in products %}
+<div class="col-md-3 mb-4">
+    <div class="card shadow-sm border-0 animate__animated animate__zoomIn">
+        <div class="card-body">
+            <p class="badge bg-warning text-dark">{{ p.store.store_name }}</p>
+            <h5>{{ p.product_name }}</h5>
+            
+            <p class="text-muted small mb-1">
+                Stock: <strong>{{ p.inventory.quantity }}</strong><br>
+                Location: {{ p.store.store_address }}
+            </p>
+            
+            <p class="text-danger fw-bold">₱{{ p.price }}</p>
+            
+            <button onclick="addToCart({{ p.id }})" class="btn btn-outline-danger w-100 mb-2">Buy Now</button>
+            
+            <form action="{% url 'delete_product' p.id %}" method="POST" onsubmit="return confirm('Remove this item from POS?')">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-link text-muted small w-100 p-0">Delete Item</button>
+            </form>
         </div>
     </div>
-    {% endfor %}
 </div>
-
-<script>
-function addToCart(productId) {
-    const customerId = document.getElementById('pos-customer').value;
-    if (!customerId) {
-        alert("Please register or select a customer first!");
-        return;
-    }
-    // Redirect with customer_id as a parameter to avoid IntegrityErrors
-    window.location.href = `/buy/${productId}/?customer_id=${customerId}`;
-}
-</script>
-{% endblock %}
+{% endfor %}
