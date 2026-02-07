@@ -1,16 +1,19 @@
 {% extends 'store/base.html' %}
 {% block content %}
-<div class="card p-4 shadow animate__animated animate__fadeIn">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Order Summary</h2>
+<div class="card p-4 shadow border-0 animate__animated animate__fadeInUp">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <div>
+            <h2 class="fw-bold mb-0">Order Summary</h2>
+            <p class="text-muted small">Manage items and confirm payment</p>
+        </div>
         
         <div class="col-md-4">
-            <label class="small fw-bold">View Cart For:</label>
-            <select class="form-select" onchange="location = this.value;">
+            <label class="small fw-bold text-muted">Switch to another Cart:</label>
+            <select class="form-select border-danger shadow-sm" onchange="location = this.value;">
                 {% for c in all_customers %}
                     <option value="{% url 'checkout_summary' %}?customer_id={{ c.id }}" 
                             {% if c.id == customer.id %}selected{% endif %}>
-                        {{ c.first_name }} {{ c.last_name }}
+                        {{ c.first_name }} {{ c.last_name }}'s Cart
                     </option>
                 {% endfor %}
             </select>
@@ -18,27 +21,33 @@
     </div>
 
     <div class="bg-light p-3 rounded mb-4">
-        <h5>Customer: <span class="text-danger">{{ customer.first_name }} {{ customer.last_name }}</span></h5>
-        <p class="mb-0"><strong>Address:</strong> {{ customer.customer_address }}</p>
+        <h5 class="mb-1 text-danger fw-bold">Current Customer: {{ customer.first_name }} {{ customer.last_name }}</h5>
+        <p class="mb-0 small text-muted"><strong>Contact:</strong> {{ customer.contact_number }} | <strong>Address:</strong> {{ customer.customer_address }}</p>
     </div>
 
-    <table class="table">
-        <thead>
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
             <tr>
                 <th>Product</th>
-                <th>Store</th>
-                <th class="text-end">Price</th>
+                <th>Branch</th>
+                <th class="text-center">Price</th>
+                <th class="text-center">Action</th>
             </tr>
         </thead>
         <tbody>
             {% for item in items %}
             <tr>
-                <td>{{ item.product.product_name }}</td>
-                <td>{{ item.order.store.store_name }}</td>
-                <td class="text-end">₱{{ item.product.price }}</td>
+                <td><strong>{{ item.product.product_name }}</strong></td>
+                <td><span class="badge bg-secondary">{{ item.order.store.store_name }}</span></td>
+                <td class="text-center fw-bold">₱{{ item.product.price }}</td>
+                <td class="text-center">
+                    <a href="{% url 'remove_from_cart' item.id %}" class="btn btn-sm btn-outline-danger shadow-sm">
+                        Remove
+                    </a>
+                </td>
             </tr>
             {% empty %}
-            <tr><td colspan="3" class="text-center text-muted">This customer's cart is empty.</td></tr>
+            <tr><td colspan="4" class="text-center py-5 text-muted">This cart is empty. Choose another customer or go back to browse.</td></tr>
             {% endfor %}
         </tbody>
     </table>
@@ -47,7 +56,9 @@
     <form action="{% url 'process_payment' %}" method="POST">
         {% csrf_token %}
         <input type="hidden" name="customer_id" value="{{ customer.id }}">
-        <button class="btn btn-danger btn-lg w-100 mt-3">Confirm and Pay</button>
+        <button type="submit" class="btn btn-danger btn-lg w-100 mt-3 shadow">
+            Confirm Payment for {{ customer.first_name }}
+        </button>
     </form>
     {% endif %}
 </div>

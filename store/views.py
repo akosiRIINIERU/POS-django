@@ -89,16 +89,16 @@ def add_to_checkout(request, product_id):
     return redirect(f'/?customer_id={customer.id}')
 
 def checkout_summary(request):
-    # Get ID from URL, e.g., /checkout/?customer_id=3
+    # Capture the specific customer ID from the URL (e.g., ?customer_id=2)
     customer_id = request.GET.get('customer_id')
     
-    # Fetch all customers so we can show them in a dropdown
-    all_customers = Customer.objects.all() 
+    # Get all customers so the dropdown has everyone's name
+    all_customers = Customer.objects.all()
     
-    # Get the specific customer or default to the first one (Erika)
+    # Identify the specific customer or fallback to the first one available
     customer = Customer.objects.filter(id=customer_id).first() or Customer.objects.first()
     
-    # Get the active order for the selected person
+    # Fetch the uncompleted order for this specific person
     order = Order.objects.filter(customer=customer, complete=False).first()
     items = order.orderitem_set.all() if order else []
     
@@ -106,7 +106,7 @@ def checkout_summary(request):
         'items': items, 
         'order': order, 
         'customer': customer,
-        'all_customers': all_customers # Now you can see everyone in the cart!
+        'all_customers': all_customers # Crucial for the switcher dropdown
     })
 
 def process_payment(request):
@@ -147,3 +147,44 @@ def history_page(request):
         'customer': customer,
         'all_customers': all_customers
     })
+
+def edit_customer(request, customer_id):
+    customer = get_object_or_404(Customer, id=customer_id)
+    if request.method == "POST":
+        customer.first_name = request.POST.get('first_name')
+        customer.last_name = request.POST.get('last_name')
+        customer.email = request.POST.get('email')
+        customer.contact_number = request.POST.get('contact_number')
+        customer.customer_address = request.POST.get('customer_address')
+        customer.save()
+        return redirect('customer_list')
+    
+    return render(request, 'store/customers/edit.html', {'customer': customer})
+
+def edit_inventory(request, inventory_id):
+    item = get_object_or_404(Inventory, id=inventory_id)
+    stores = Store.objects.all()
+    
+    if request.method == "POST":
+        new_store_id = request.POST.get('store_id')
+        item.store = get_object_or_404(Store, id=new_store_id)
+        item.quantity = request.POST.get('quantity')
+        # Also update the product's price and store if needed
+        item.product.price = request.POST.get('price')
+        item.product.store = item.store
+        item.product.save()
+        item.save()
+        return redirect('inventory_manage')
+    
+    return render(request, 'store/inventory/edit.html', {'item': item, 'stores': stores})
+
+def remove_from_cart(request, item_id):
+    # Get the specific item in the order
+    item = get_object_or_404(OrderItem, id=item_id)
+    customer_id = item.order.customer.id
+    
+    # Delete the item
+    item.delete()
+    
+    # Redirect back to the summary page for that specific customer
+    return redirect(f'/checkout/?customer_id={customer_id}')

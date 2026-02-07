@@ -1,44 +1,37 @@
 {% extends 'store/base.html' %}
 {% block content %}
-<div class="card p-4 shadow animate__animated animate__fadeIn">
+<div class="card p-4 shadow border-0 animate__animated animate__fadeIn">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Purchase History</h2>
-        
+        <h2 class="fw-bold">History</h2>
         <div class="col-md-4">
-            <label class="small fw-bold">View History For:</label>
-            <select class="form-select" onchange="location = this.value;">
+            <select class="form-select border-danger" onchange="location = this.value;">
                 {% for c in all_customers %}
-                    <option value="{% url 'history_page' %}?customer_id={{ c.id }}" 
-                            {% if c.id == customer.id %}selected{% endif %}>
-                        {{ c.first_name }} {{ c.last_name }}
+                    <option value="{% url 'history_page' %}?customer_id={{ c.id }}" {% if c.id == customer.id %}selected{% endif %}>
+                        View for: {{ c.first_name }}
                     </option>
                 {% endfor %}
             </select>
         </div>
     </div>
 
-    <h5 class="mb-3">Showing orders for: <span class="text-danger">{{ customer.first_name }}</span></h5>
-
     {% for order in orders %}
-    <div class="card mb-3 border-start border-danger border-4">
+    <div class="card mb-3 border-start border-danger border-4 shadow-sm">
         <div class="card-body">
             <div class="d-flex justify-content-between">
-                <h6>Order #{{ order.id }} - {{ order.date_ordered|date:"M d, Y" }}</h6>
-                <span class="badge bg-success">Paid</span>
+                <span class="fw-bold">Order #{{ order.id }}</span>
+                <span class="text-muted">{{ order.date_ordered|date:"M d, Y" }}</span>
             </div>
             <hr>
             {% for item in order.orderitem_set.all %}
             <div class="d-flex justify-content-between small">
                 <span>{{ item.product.product_name }}</span>
-                <span>₱{{ item.product.price }}</span>
+                <span class="fw-bold">₱{{ item.product.price }}</span>
             </div>
             {% endfor %}
         </div>
     </div>
     {% empty %}
-    <div class="text-center py-5 text-muted">
-        No completed orders found for {{ customer.first_name }}.
-    </div>
+    <p class="text-center py-5 text-muted">No completed orders found.</p>
     {% endfor %}
 </div>
 {% endblock %}

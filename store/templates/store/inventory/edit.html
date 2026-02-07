@@ -1,0 +1,26 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<div class="card p-4 shadow mx-auto" style="max-width: 500px;">
+    <h4>Edit Inventory: {{ item.product.product_name }}</h4>
+    <form method="POST">
+        {% csrf_token %}
+        <label>Change Shop/Branch</label>
+        <select name="store_id" class="form-control mb-2">
+            {% for store in stores %}
+                <option value="{{ store.id }}" {% if store.id == item.store.id %}selected{% endif %}>
+                    {{ store.store_name }}
+                </option>
+            {% endfor %}
+        </select>
+        
+        <label>Price</label>
+        <input type="number" name="price" class="form-control mb-2" value="{{ item.product.price }}">
+        
+        <label>Current Stock</label>
+        <input type="number" name="quantity" class="form-control mb-2" value="{{ item.quantity }}">
+        
+        <button class="btn btn-success w-100 mt-2">Update Inventory</button>
+        <a href="{% url 'inventory_manage' %}" class="btn btn-link w-100">Cancel</a>
+    </form>
+</div>
+{% endblock %}
