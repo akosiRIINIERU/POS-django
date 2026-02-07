@@ -1,0 +1,15 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<h2>Our Store Branches</h2>
+<div class="row">
+    {% for store in stores %}
+    <div class="col-md-4 mb-3 animate__animated animate__slideInUp">
+        <div class="card border-primary p-3 h-100">
+            <h5 class="text-primary">{{ store.store_name }}</h5>
+            <p class="mb-0"><strong>Address:</strong></p>
+            <p>{{ store.store_address }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

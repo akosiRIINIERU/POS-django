@@ -1,0 +1,19 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<h2 class="animate__animated animate__fadeIn">Orange Flash Sale</h2>
+<div class="row">
+    {% for p in products %}
+    <div class="col-md-3 mb-4">
+        <div class="card shadow-sm border-0 animate__animated animate__zoomIn">
+            <div class="card-body">
+                <p class="badge bg-warning text-dark">{{ p.store.store_name }}</p>
+                <h5>{{ p.product_name }}</h5>
+                <p class="text-danger fw-bold">₱{{ p.price }}</p>
+                <p class="text-muted small">{{ p.store.store_address }}</p>
+                <a href="{% url 'add_to_checkout' p.id %}" class="btn btn-outline-danger w-100">Buy Now</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

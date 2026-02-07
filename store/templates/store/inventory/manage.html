@@ -1,0 +1,39 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card p-3 shadow">
+            <h4>Register New Stock</h4>
+            <form method="POST">
+                {% csrf_token %}
+                <label>Select Store Branch</label>
+                <select name="store_id" class="form-control mb-2">
+                    {% for store in stores %}
+                        <option value="{{ store.id }}">{{ store.store_name }} ({{ store.store_address }})</option>
+                    {% endfor %}
+                </select>
+                <input type="text" name="name" class="form-control mb-2" placeholder="Product Name">
+                <input type="number" name="price" class="form-control mb-2" placeholder="Price">
+                <input type="number" name="quantity" class="form-control mb-2" placeholder="Quantity">
+                <button class="btn btn-primary w-100">Add to Inventory</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <h4>Master Inventory List</h4>
+        <table class="table">
+            <thead><tr><th>Store</th><th>Item</th><th>Stock</th><th>Address</th></tr></thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.store.store_name }}</td>
+                    <td>{{ item.product.product_name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td><small>{{ item.store.store_address }}</small></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<div class="row animate__animated animate__fadeIn">
+    <div class="col-md-4">
+        <div class="card shadow-sm p-4 sticky-top" style="top: 20px;">
+            <h4>Register New Customer</h4>
+            <hr>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-2">
+                    <label class="small fw-bold">First Name</label>
+                    <input type="text" name="first_name" class="form-control" required>
+                </div>
+                <div class="mb-2">
+                    <label class="small fw-bold">Last Name</label>
+                    <input type="text" name="last_name" class="form-control" required>
+                </div>
+                <div class="mb-2">
+                    <label class="small fw-bold">Email Address</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+                <div class="mb-2">
+                    <label class="small fw-bold">Contact Number</label>
+                    <input type="text" name="contact_number" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="small fw-bold">Home/Shipping Address</label>
+                    <textarea name="customer_address" class="form-control" rows="2" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 shadow-sm">Add to POS Registry</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <h2 class="mb-4">POS Customer Directory</h2>
+        <div class="card shadow-sm border-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Contact</th>
+                        <th>Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers %}
+                    <tr>
+                        <td class="fw-bold">{{ customer.first_name }} {{ customer.last_name }}</td>
+                        <td>
+                            <div class="small">{{ customer.email }}</div>
+                            <div class="text-muted small">{{ customer.contact_number }}</div>
+                        </td>
+                        <td class="small">{{ customer.customer_address }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" class="text-center text-muted">No customers registered yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
