@@ -41,7 +41,7 @@
                         <th>Name</th>
                         <th>Contact</th>
                         <th>Address</th>
-                    </tr>
+                        <th class="text-center">Action</th> </tr>
                 </thead>
                 <tbody>
                     {% for customer in customers %}
@@ -52,9 +52,16 @@
                             <div class="text-muted small">{{ customer.contact_number }}</div>
                         </td>
                         <td class="small">{{ customer.customer_address }}</td>
+                        <td class="text-center">
+                            <form action="{% url 'delete_customer' customer.id %}" method="POST" 
+                                  onsubmit="return confirm('Delete this customer? This will also remove their order history.')">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="3" class="text-center text-muted">No customers registered yet.</td></tr>
+                    <tr><td colspan="4" class="text-center text-muted">No customers registered yet.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
